@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选择模式</title>
+    <style>
+        body {
+            background: linear-gradient(to right,
+             rgb(136, 190, 235), 
+             rgb(58, 104, 230));
+        }
+        #div {
+            width: 30%;
+            height: 50vh;
+            margin-top: 25vh;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin-left: 35%;
+            border-radius: 50px;
+            box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        input {
+            width: 50%;
+            height: 5vh;
+            margin-left: 25%;
+            margin-top: 10vh;
+            border: none;
+            border-radius: 25px;
+            outline: none;
+            background-color: rgb(247, 248, 248, 0.3);
+        }
+        h1 {
+            text-align: center;
+            font-size: 300%;
+            color: rgb(56, 66, 82);
+        }
+        button {
+            width: 30%;
+            height: 3vh;
+            margin-left: 35%;
+            margin-top: 5vh;
+            border: none;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        button:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div id="div">
+        <h1>选择玩法</h1>
+        <input type="text" placeholder="请输入你选择的模式(双人井字棋、AI井字棋)" id="input">
+        <div>
+            <button id="button">确定</button>
+        </div>
+        <script>
+            var button = document.getElementById("button")
+            button.addEventListener("click", function(event) {
+                var input = document.getElementById("input").value;
+                if (input === "双人井字棋") {
+                    window.open("./双人对战.html");
+                }
+                else if (input === "AI井字棋") {
+                    window.open("./人机对战.html");
+                }
+                else {
+                    alert("跳转失败");
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

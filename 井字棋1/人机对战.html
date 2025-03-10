@@ -1,0 +1,223 @@
+<!DOCTYPE html>  
+<html lang="zh-CN">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>井字棋 (人机对战)</title>  
+    <style>  
+        body {  
+            font-family: Arial, sans-serif;  
+            display: flex;  
+            flex-direction: column;  
+            align-items: center;  
+            justify-content: center;  
+            min-height: 100vh;  
+            background-color: #f0f0f0;  
+        }  
+
+        h1 {  
+            color: #333;  
+            margin-bottom: 20px;  
+        }  
+
+        #board {  
+            display: grid;  
+            grid-template-columns: repeat(3, 120px);  
+            grid-gap: 10px;  
+            margin: 20px;  
+            background-color: #fff;  
+            padding: 20px;  
+            border-radius: 10px;  
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  
+        }  
+
+        .cell {  
+            width: 120px;  
+            height: 120px;  
+            border: 2px solid #ddd;  
+            display: flex;  
+            justify-content: center;  
+            align-items: center;  
+            font-size: 3em;  
+            cursor: pointer;  
+            background-color: #eee;  
+            border-radius: 5px;  
+            transition: background-color 0.2s ease;
+        }  
+
+        .cell:hover {  
+            background-color: #d0d0d0;  
+        }  
+
+        #result {  
+            font-size: 1.5em;  
+            margin-top: 20px;  
+            color: #555;  
+        }  
+
+        #restart {  
+            padding: 10px 20px;  
+            font-size: 1em;  
+            background-color: #4CAF50;  
+            color: white;  
+            border: none;  
+            border-radius: 5px;  
+            cursor: pointer;  
+            transition: background-color 0.2s ease;  
+        }  
+
+        #restart:hover {  
+            background-color: #3e8e41;  
+        }  
+    </style>  
+</head>  
+<body>  
+    <h1>井字棋 (人机对战)</h1>  
+    <div id="board">  
+        <div class="cell" data-index="0"></div>  
+        <div class="cell" data-index="1"></div>  
+        <div class="cell" data-index="2"></div>  
+        <div class="cell" data-index="3"></div>  
+        <div class="cell" data-index="4"></div>  
+        <div class="cell" data-index="5"></div>  
+        <div class="cell" data-index="6"></div>  
+        <div class="cell" data-index="7"></div>  
+        <div class="cell" data-index="8"></div>  
+    </div>  
+    <div id="result"></div>  
+    <button id="restart">重新开始</button>  
+
+    <script>  
+        alert("跳转成功");
+        const board = document.getElementById('board');  
+        const cells = document.querySelectorAll('.cell');  
+        const result = document.getElementById('result');  
+        const restartButton = document.getElementById('restart');  
+        let currentPlayer = 'X';  
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];  
+        let gameActive = true;  
+
+        const winningCombinations = [  
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],  
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],  
+            [0, 4, 8], [2, 4, 6]  
+        ];  
+
+        function checkWinner() {  
+            for (let combination of winningCombinations) {  
+                const [a, b, c] = combination;  
+                if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {  
+                    gameActive = false;  
+                    return gameBoard[a];  
+                }  
+            }  
+            if (!gameBoard.includes('')) {  
+                gameActive = false;  
+                return 'Tie';  
+            }  
+            return null;  
+        }  
+
+        function handleClick(cell, index) {  
+            if (gameBoard[index] === '' && gameActive) {  
+                gameBoard[index] = currentPlayer;  
+                cell.textContent = currentPlayer;  
+                let winner = checkWinner();  
+                if (winner) {  
+                    result.textContent = winner === 'Tie' ? '平局!' : `玩家 ${winner} 获胜!`;  
+                } else {  
+                    currentPlayer = 'O';  
+                    setTimeout(aiMove, 500); // AI 思考时间  
+                }  
+            }  
+        }  
+
+        function aiMove() {  
+            if (!gameActive) return;  
+            let bestMove = findBestMove(gameBoard);  
+            gameBoard[bestMove] = 'O';  
+            cells[bestMove].textContent = 'O';  
+            currentPlayer = 'X';  
+            let winner = checkWinner();  
+            if (winner) {  
+                result.textContent = winner === 'Tie' ? '平局!' : `AI 获胜!`;  
+            }  
+        }  
+
+        function evaluate(board) {  
+            for (let combination of winningCombinations) {  
+                const [a, b, c] = combination;  
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {  
+                    if (board[a] === 'O') return 10; // AI 胜  
+                    else return -10; // 玩家胜  
+                }  
+            }  
+            return 0; // 平局  
+        }  
+
+        function minimax(board, depth, isMaximizing) {  
+            let score = evaluate(board);  
+
+            if (score === 10) return score - depth; // 提前结束，奖励更快的胜利  
+            if (score === -10) return score + depth; // 提前结束，惩罚更快的失败  
+            if (!board.includes('')) return 0; // 平局  
+
+            if (isMaximizing) {  
+                let best = -Infinity;  
+                for (let i = 0; i < 9; i++) {  
+                    if (board[i] === '') {  
+                        board[i] = 'O';  
+                        best = Math.max(best, minimax(board, depth + 1, !isMaximizing));  
+                        board[i] = ''; // 撤销操作  
+                    }  
+                }  
+                return best;  
+            } else {  
+                let best = Infinity;  
+                for (let i = 0; i < 9; i++) {  
+                    if (board[i] === '') {  
+                        board[i] = 'X';  
+                        best = Math.min(best, minimax(board, depth + 1, !isMaximizing));  
+                        board[i] = ''; // 撤销操作  
+                    }  
+                }  
+                return best;  
+            }  
+        }  
+
+        function findBestMove(board) {  
+            let bestMove = -1;  
+            let bestVal = -Infinity;  
+
+            for (let i = 0; i < 9; i++) {  
+                if (board[i] === '') {  
+                    board[i] = 'O';  
+                    let moveVal = minimax(board, 0, false);  
+                    board[i] = ''; // 撤销操作  
+
+                    if (moveVal > bestVal) {  
+                        bestMove = i;  
+                        bestVal = moveVal;  
+                    }  
+                }  
+            }  
+            return bestMove;  
+        }  
+
+
+        function restartGame() {  
+            gameBoard = ['', '', '', '', '', '', '', '', ''];  
+            gameActive = true;  
+            currentPlayer = 'X';  
+            result.textContent = '';  
+            cells.forEach(cell => cell.textContent = '');  
+        }  
+
+        cells.forEach((cell, index) => {  
+            cell.addEventListener('click', () => handleClick(cell, index));  
+        });  
+
+        restartButton.addEventListener('click', restartGame);  
+    </script>  
+</body>  
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <title>井字棋</title>  
+    <style>  
+        body {  
+            font-family: 'Arial', sans-serif;  
+            background-color: #f4f4f4;  
+            display: flex;  
+            flex-direction: column;  
+            align-items: center;  
+            justify-content: center;  
+            min-height: 100vh;  
+            margin: 0;  
+        }  
+
+        h1 {  
+            text-align: center;  
+            color: #333;  
+            margin-bottom: 20px;  
+        }  
+
+        #board {  
+            display: grid;  
+            grid-template-columns: repeat(3, 120px); /* Increase cell size */  
+            grid-gap: 10px;  
+            margin: 20px auto;  
+            width: 380px; /* Adjust width */  
+        }  
+
+        .cell {  
+            width: 120px; /* Match width with grid */  
+            height: 120px; /* Match height with grid */  
+            background-color: #fff; /* White cells */  
+            border: 2px solid #ddd; /* Lighter border */  
+            display: flex;  
+            justify-content: center;  
+            align-items: center;  
+            font-size: 70px; /* Larger font size */  
+            cursor: pointer;  
+            color: #555;  
+            transition: background-color 0.3s ease;  
+        }  
+
+        .cell:hover {  
+            background-color: #e0e0e0; /* Light gray on hover */  
+        }  
+
+        button {  
+            margin-top: 20px;  
+            padding: 10px 20px;  
+            font-size: 16px;  
+            background-color: #5cb85c; /* Bootstrap success color */  
+            color: white;  
+            border: none;  
+            border-radius: 5px;  
+            cursor: pointer;  
+            transition: background-color 0.3s ease;  
+        }  
+
+        button:hover {  
+            background-color: #4cae4c; /* Darker shade on hover */  
+        }  
+
+        #message {  
+            text-align: center;  
+            margin-top: 20px;  
+            font-size: 18px;  
+            color: #777;  
+        }  
+        #board {  
+            display: grid;  
+            grid-template-columns: repeat(3, 120px);  
+            grid-gap: 10px;  
+            margin: 20px;  
+            background-color: #fff;  
+            padding: 20px;  
+            border-radius: 10px;  
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>  
+</head>  
+<body>  
+    <h1>双人井字棋</h1>  
+    <div id="board">  
+        <div class="cell" data-index="0"></div>  
+        <div class="cell" data-index="1"></div>  
+        <div class="cell" data-index="2"></div>  
+        <div class="cell" data-index="3"></div>  
+        <div class="cell" data-index="4"></div>  
+        <div class="cell" data-index="5"></div>  
+        <div class="cell" data-index="6"></div>  
+        <div class="cell" data-index="7"></div>  
+        <div class="cell" data-index="8"></div>  
+    </div>  
+    <p id="message"></p>  
+    <button id="resetBtn">重新开始</button>  
+    <script>  
+        alert("跳转成功");
+        const board = document.getElementById('board');  
+        const cells = document.querySelectorAll('.cell');  
+        const message = document.getElementById('message');  
+        const resetBtn = document.getElementById('resetBtn');  
+        let currentPlayer = 'X';  
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];  
+        let gameActive = true;  
+        const winningCombinations = [  
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],  
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],  
+            [0, 4, 8], [2, 4, 6]  
+        ];  
+
+        function checkWin() {  
+            for (let combination of winningCombinations) {  
+                const [a, b, c] = combination;  
+                if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {  
+                    alert(`玩家 ${gameBoard[a]} 获胜!`);  
+                    gameActive = false;  
+                    return;  
+                }  
+            }  
+
+            if (!gameBoard.includes('')) {  
+                alert('平局!');  
+                gameActive = false;  
+            }  
+        }  
+
+        function handleClick(event) {  
+            const index = event.target.dataset.index;  
+            if (gameBoard[index] === '' && gameActive) {  
+                gameBoard[index] = currentPlayer;  
+                event.target.textContent = currentPlayer;  
+                checkWin();  
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';  
+            }  
+        }  
+
+        function resetGame() {  
+            gameBoard = ['', '', '', '', '', '', '', '', ''];  
+            gameActive = true;  
+            currentPlayer = 'X';  
+            cells.forEach(cell => {  
+                cell.textContent = '';  
+            });  
+        }  
+
+        cells.forEach(cell => {  
+            cell.addEventListener('click', handleClick);  
+        });  
+
+        resetBtn.addEventListener('click', resetGame);  
+    </script>  
+</body>  
+</html>  
